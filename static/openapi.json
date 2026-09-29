@@ -1,0 +1,285 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Incident Priority API",
+    "version": "2.0.0",
+    "description": "API REST do MVP para cadastro, análise, priorização e acompanhamento de incidentes de segurança."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:5000"
+    }
+  ],
+  "paths": {
+    "/api/ativos": {
+      "get": {
+        "summary": "Lista os ativos cadastrados.",
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "404": {
+            "description": "Recurso não encontrado."
+          }
+        }
+      },
+      "post": {
+        "summary": "Cadastra um novo ativo.",
+        "responses": {
+          "201": {
+            "description": "Operação realizada com sucesso."
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "404": {
+            "description": "Recurso não encontrado."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "nome",
+                  "criticidade"
+                ],
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "example": "Servidor Financeiro"
+                  },
+                  "criticidade": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "example": 5
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/incidentes": {
+      "get": {
+        "summary": "Lista incidentes priorizados por risco.",
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "404": {
+            "description": "Recurso não encontrado."
+          }
+        }
+      },
+      "post": {
+        "summary": "Cadastra um incidente e calcula o Risk Score.",
+        "responses": {
+          "201": {
+            "description": "Operação realizada com sucesso."
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "404": {
+            "description": "Recurso não encontrado."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "titulo",
+                  "descricao",
+                  "tipo",
+                  "severidade",
+                  "ativo_id"
+                ],
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "example": "Tentativa de acesso não autorizado"
+                  },
+                  "descricao": {
+                    "type": "string",
+                    "example": "Múltiplas tentativas de autenticação foram detectadas."
+                  },
+                  "tipo": {
+                    "type": "string",
+                    "example": "Acesso indevido"
+                  },
+                  "severidade": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "example": 5
+                  },
+                  "ativo_id": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/incidentes/{id}": {
+      "get": {
+        "summary": "Busca um incidente pelo ID.",
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "404": {
+            "description": "Recurso não encontrado."
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Exclui um incidente e seu histórico.",
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "404": {
+            "description": "Recurso não encontrado."
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/incidentes/{id}/status": {
+      "patch": {
+        "summary": "Atualiza o status e registra a mudança no histórico.",
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "404": {
+            "description": "Recurso não encontrado."
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ABERTO",
+                      "EM ANÁLISE",
+                      "CONTIDO",
+                      "RESOLVIDO"
+                    ],
+                    "example": "EM ANÁLISE"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/incidentes/{id}/historico": {
+      "get": {
+        "summary": "Lista o histórico de status do incidente.",
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "404": {
+            "description": "Recurso não encontrado."
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "summary": "Retorna indicadores consolidados para o dashboard.",
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "404": {
+            "description": "Recurso não encontrado."
+          }
+        }
+      }
+    }
+  }
+}
